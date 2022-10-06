@@ -1,7 +1,7 @@
 ## TOP: Admin Dashboard
 
 <p align="center">
-  <img src="https://imgur.com/a/teTBsQF" width="600" alt="project pic">
+  <img src="https://i.imgur.com/jKG6BnL.png" width="600" alt="project pic">
 </p>
 <h2 align="center">
 <a href="https://ferprimoso.github.io/tictactoe-js/">DEMO</a>

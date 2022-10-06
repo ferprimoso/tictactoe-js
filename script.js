@@ -2,6 +2,8 @@
 const displayController = (() => {
 
     const _displayArray = document.querySelectorAll(".game-cell");
+    const _displayBoard = document.querySelector(".game-board");
+    const _displayMenu = document.querySelector(".menu");
 
     function getDisplayArray(){
         return _displayArray;
@@ -14,9 +16,35 @@ const displayController = (() => {
       }
     }
 
+    function gameOverScreen(symbol) {
+        const gameOverDiv = document.querySelector(".game-over");
+        gameOverDiv.appendChild(document.createElement('h1'));    
+        gameOverDiv.querySelector('h1').textContent = 'GAME OVER';
+        gameOverDiv.appendChild(document.createElement('h2'));
+        
+        if (symbol === 'draw') {
+            gameOverDiv.querySelector('h2').textContent = 'Draw!';
+        } else {
+            gameOverDiv.querySelector('h2').textContent = 'Player: ' + symbol + ' Wins!';
+
+        }
+
+        gameOverDiv.appendChild(document.createElement('button'));
+        gameOverDiv.querySelector('button').textContent = 'PLAY AGAIN!';
+
+        gameOverDiv.querySelector('button').addEventListener('click', () => window.location.reload());
+    }
+
+    function displayGame() {
+        _displayMenu.style.display = 'none';
+        _displayBoard.style.visibility = 'visible';
+    }
+
     return {
         getDisplayArray: getDisplayArray,
-        updateDisplay: updateDisplay
+        updateDisplay: updateDisplay,
+        gameOverScreen: gameOverScreen,
+        displayGame: displayGame
     }
 
     
@@ -38,7 +66,11 @@ const gameBoard = (() => {
     }
     
     function add(index, symbol) {
+        if (_gameboardArray[index] !== '') {
+            return 0;
+        }
         _gameboardArray[index] = symbol;
+        return 1;
     }
     
 
@@ -63,8 +95,8 @@ const player = (symbol) => {
 
 //main game
 const mainGame = (() => {
-    const gameEnd = false;
     const gameDisplay = displayController.getDisplayArray();
+    
     let currentPlayer = 1;
     
     function _getCurrentPlayer() {
@@ -79,34 +111,48 @@ const mainGame = (() => {
         currentPlayer === 1 ? currentPlayer = 2 : currentPlayer = 1;
     }
 
-    function _checkWin(gameBoard, player) {
+    function _checkWin(gameBoard, player, boardChanged) {
         const S = player.getPlayerSymbol();
 
-        if(
-            gameBoard.slice(0,3) ||
-            gameBoard.slice(3,6) ||
-            gameBoard.slice(6,9) ||
-            [gameBoard[0], gameBoard[3], gameBoard[6]] ||
-            [gameBoard[1], gameBoard[4], gameBoard[7]] ||
-            [gameBoard[2], gameBoard[5], gameBoard[8]] ||
-            [gameBoard[0], gameBoard[4], gameBoard[8]] ||
-            [gameBoard[2], gameBoard[4], gameBoard[6]] === [S, S, S]
-        ) {
-            console.log(player.getPlayerSymbol() + " Win !");
+        const solutions = [ 
+            gameBoard.slice(0,3), 
+            gameBoard.slice(3,6),
+            gameBoard.slice(6,9),
+            [gameBoard[0], gameBoard[3], gameBoard[6]], 
+            [gameBoard[1], gameBoard[4], gameBoard[7]], 
+            [gameBoard[2], gameBoard[5], gameBoard[8]], 
+            [gameBoard[0], gameBoard[4], gameBoard[8]], 
+            [gameBoard[2], gameBoard[4], gameBoard[6]]
+        ]
+
+        for (const sol of solutions) {
+            if (sol.toString() == [S, S, S].toString()){
+                console.log(player.getPlayerSymbol() + " Win !");
+                displayController.gameOverScreen(S);
+                playRound = {};
+                return;
+            }
+        }
+
+        if (!gameBoard.includes('') === true) {
+            displayController.gameOverScreen('draw');
+            playRound = {};
         }
         
-        _changeCurrentPlayer();
+        if (boardChanged === 1) _changeCurrentPlayer();
+        
     }
 
 
     function playRound(index) {  
-        gameBoard.add(index, _getCurrentPlayer().getPlayerSymbol());
+        const checkBoardChange = gameBoard.add(index, _getCurrentPlayer().getPlayerSymbol());
         displayController.updateDisplay(gameBoard.getGameboardArray());
-        _checkWin(gameBoard.getGameboardArray(), _getCurrentPlayer());
+        _checkWin(gameBoard.getGameboardArray(), _getCurrentPlayer(), checkBoardChange);
     }
 
     function start(playerOne, playerTwo) {
         console.log(gameDisplay)
+        displayController.displayGame();
 
         for (let i = 0; i < gameDisplay.length; i++) {
             gameDisplay[i].addEventListener('click', () => playRound(i));
@@ -122,13 +168,14 @@ const mainGame = (() => {
 
 })();
 
+const gameMenu = (() => {
 
+})();
+
+const startGameButton = document.querySelector('button');
 const playerOne = player('X');
 const playerTwo = player('O');
 
-mainGame.start(playerOne, playerTwo);
+startGameButton.addEventListener('click', () => mainGame.start(playerOne, playerTwo));
 
-
-
-gameBoard.printGameboardArray();
 

@@ -11,23 +11,28 @@
 <body>
 
     <div class="main">
-        <div class="menu">
+        <form class="menu">
             <h1 class="title">Tic Tac Toe</h1>
             <div>
-                <h2>Player one:</h2>
-                <label for="p1-symbol-X">X</label>
-                <input type="radio" name="symbolSelect" id="p1-symbol-X"checked>
-                <label for="p1-symbol-X">O</label>
-                <input type="radio" name="symbolSelect" id="p1-symbol-O">
-                <h2>Player two:</h2>
-                <label for="p2-symbol-X">X</label>
-                <input type="radio" name="symbolSelect2" id="p2-symbol-X">
-                <label for="p2-symbol-X">O</label>
-                <input type="radio" name="symbolSelect2" id="p2-symbol-O" checked>
-                <br>
+                <div class="player-name">
+                    <h2>Player one name:</h2>
+                    <input type="text" name="player1-name" id="p1name" required>
+                    <select id="symbol1" name="player1-name" class="symbol-select">
+                        <option value="X">X</option>
+                        <option value="O">O</option>
+                    </select>
+                </div>
+                <div class="player-name">
+                    <h2>Player two name:</h2>
+                    <input type="text" name="player2-name" id="p2name" required>
+                    <select id="symbol2" class="symbol-select">
+                        <option value="O">O</option>
+                        <option value="X">X</option>
+                    </select>
+                </div>
             </div>
-            <button class="startgame-btn">Start Game</button>
-        </div>
+            <button type="submit" class="startgame-btn">Start Game</button>
+        </form>
         <div class="game-board">
             <div class="game-cell"></div>
             <div class="game-cell"></div>

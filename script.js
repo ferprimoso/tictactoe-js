@@ -4,7 +4,8 @@ const displayController = (() => {
     const _displayArray = document.querySelectorAll(".game-cell");
     const _displayBoard = document.querySelector(".game-board");
     const _displayMenu = document.querySelector(".menu");
-
+    const _currentTurnDiv = document.querySelector('.game-over');
+    
     function getDisplayArray(){
         return _displayArray;
     }
@@ -16,25 +17,28 @@ const displayController = (() => {
       }
     }
 
-    function gameOverScreen(symbol) {
-        const gameOverDiv = document.querySelector(".game-over");
-        gameOverDiv.appendChild(document.createElement('h1'));    
-        gameOverDiv.querySelector('h1').textContent = 'GAME OVER';
-        gameOverDiv.appendChild(document.createElement('h2'));
+    function gameOverScreen(player) {    
         
-        if (symbol === 'draw') {
-            gameOverDiv.querySelector('h2').textContent = 'Draw!';
+        if (player === 'draw') {
+            _currentTurnDiv.appendChild(document.createElement('h2'));
+            _currentTurnDiv.querySelector('h2').textContent = 'Draw!';
         } else {
-            gameOverDiv.querySelector('h2').textContent = 'Player: ' + symbol + ' Wins!';
+            _currentTurnDiv.appendChild(document.createElement('h2'));
+            _currentTurnDiv.querySelector('h2').textContent = 'Player: ' + player.getPlayerName() + ' Wins!';
 
         }
 
-        gameOverDiv.appendChild(document.createElement('button'));
-        gameOverDiv.querySelector('button').textContent = 'PLAY AGAIN!';
+        _currentTurnDiv.appendChild(document.createElement('button'));
+        _currentTurnDiv.querySelector('button').textContent = 'PLAY AGAIN!';
 
-        gameOverDiv.querySelector('button').addEventListener('click', () => window.location.reload());
+        _currentTurnDiv.querySelector('button').addEventListener('click', () => window.location.reload());
     }
 
+    function displayCurrentTurn(player) {
+        _currentTurnDiv.appendChild(document.createElement('h1'));
+        _currentTurnDiv.querySelector('h1').textContent = player.getPlayerName() + ' Turn.';
+        
+    }
     function displayGame() {
         _displayMenu.style.display = 'none';
         _displayBoard.style.visibility = 'visible';
@@ -44,6 +48,7 @@ const displayController = (() => {
         getDisplayArray: getDisplayArray,
         updateDisplay: updateDisplay,
         gameOverScreen: gameOverScreen,
+        displayCurrentTurn: displayCurrentTurn,
         displayGame: displayGame
     }
 
@@ -55,14 +60,8 @@ const gameBoard = (() => {
 
     const _gameboardArray = ['', '', '', '', '', '', '', '', ''];
 
-
     function getGameboardArray()  {
         return _gameboardArray;
-    }
-    
-
-    function printGameboardArray()  {
-        console.log(_gameboardArray.slice(0 , 3) + '\n' +  _gameboardArray.slice(3, 6) + '\n' + _gameboardArray.slice(6, 9));
     }
     
     function add(index, symbol) {
@@ -73,10 +72,8 @@ const gameBoard = (() => {
         return 1;
     }
     
-
     return {
         getGameboardArray: getGameboardArray,
-        printGameboardArray: printGameboardArray,
         add: add
     };
 
@@ -84,19 +81,24 @@ const gameBoard = (() => {
 
 //player
 
-const player = (symbol) => {
+const player = (symbol, name) => {
     
     const getPlayerSymbol = () => {
         return symbol;
     }
 
-    return {getPlayerSymbol};
+    const getPlayerName = () => {
+        return name;
+    }
+
+    return {getPlayerSymbol, getPlayerName};
 } 
 
 //main game
 const mainGame = (() => {
     const gameDisplay = displayController.getDisplayArray();
-    
+    let playerOne = {};
+    let playerTwo = {};
     let currentPlayer = 1;
     
     function _getCurrentPlayer() {
@@ -128,54 +130,63 @@ const mainGame = (() => {
         for (const sol of solutions) {
             if (sol.toString() == [S, S, S].toString()){
                 console.log(player.getPlayerSymbol() + " Win !");
-                displayController.gameOverScreen(S);
-                playRound = {};
+                displayController.gameOverScreen(player);
+                _playRound = {};
                 return;
             }
         }
 
         if (!gameBoard.includes('') === true) {
             displayController.gameOverScreen('draw');
-            playRound = {};
+            _playRound = {};
         }
         
         if (boardChanged === 1) _changeCurrentPlayer();
         
     }
 
-
-    function playRound(index) {  
+    function _playRound(index) {  
         const checkBoardChange = gameBoard.add(index, _getCurrentPlayer().getPlayerSymbol());
         displayController.updateDisplay(gameBoard.getGameboardArray());
         _checkWin(gameBoard.getGameboardArray(), _getCurrentPlayer(), checkBoardChange);
+        displayController.displayCurrentTurn(_getCurrentPlayer());
     }
 
-    function start(playerOne, playerTwo) {
+    function start(pOne, pTwo) {
+        playerOne = pOne;
+        playerTwo = pTwo;
         console.log(gameDisplay)
         displayController.displayGame();
-
+        displayController.displayCurrentTurn(_getCurrentPlayer());
         for (let i = 0; i < gameDisplay.length; i++) {
-            gameDisplay[i].addEventListener('click', () => playRound(i));
+            gameDisplay[i].addEventListener('click', () => _playRound(i));
         }
         
 
     }
     
-
     return {
         start: start
     }
 
 })();
 
-const gameMenu = (() => {
 
-})();
 
-const startGameButton = document.querySelector('button');
-const playerOne = player('X');
-const playerTwo = player('O');
+// Start Game Form
+const startGameButton = document.querySelector('form');
+startGameButton.addEventListener('submit', function(event){
+    let player1Name = document.querySelector('#p1name').value;
+    let player1Symbol = document.querySelector('#symbol1').value;
+    let player2Name = document.querySelector('#p2name').value;
+    let player2Symbol = document.querySelector('#symbol2').value;
 
-startGameButton.addEventListener('click', () => mainGame.start(playerOne, playerTwo));
+    const playerOne = player(player1Symbol, player1Name);
+    const playerTwo = player(player2Symbol, player2Name);
+
+    console.log(playerOne.getPlayerName());
+    event.preventDefault();
+    mainGame.start(playerOne, playerTwo);
+} );
 
 

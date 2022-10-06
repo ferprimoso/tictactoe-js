@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito&family=Roboto&display=swap');
 
 :root {
-    --color-primary: orange;
+    --color-primary: lightblue;
     --color-secundary: white;
     font-family: 'Roboto', sans-serif;
 }
@@ -20,6 +20,7 @@ body {
 }
 
 h1 { 
+    margin: 2rem;
     font-size: 4rem;
     flex: 0;
 }
@@ -34,7 +35,32 @@ label {
 }
 
 input {
-    margin-right: 2rem;
+    border: 2px solid black;
+    margin: 2rem;
+    border-radius: 2rem;
+    padding-left: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border: 2px solid orange;
+}
+
+button {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: bold;
+    font-size: 2rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
+    padding: 2rem;
+    border: none;
+    transition-duration: 0.2ms;
+}
+
+button:hover {
+    transform: scale(1.1);
+
 }
 
 
@@ -43,6 +69,18 @@ input {
     font-size: 8rem;
     margin-bottom: 2rem;
     grid-row: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.player-name {
+    display: flex;
+    justify-content: center;
+}
+
+.symbol-select {
+    font-size: 2rem;
+    margin: 2rem 0;
 }
 
 .main {
